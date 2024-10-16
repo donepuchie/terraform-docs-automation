@@ -104,3 +104,4 @@ resource "google_compute_global_address" "ipv6" {
   address_type = "EXTERNAL"                      
   ip_version   = "IPV6"                           
 }
+
