@@ -35,7 +35,6 @@ jobs:
     - name: Build the Docker image
       uses: docker/build-push-action@v5
       with:
-        context: .
         file: apps/terraform-docs/Dockerfile
         tags: terraform-docs-generator
 
