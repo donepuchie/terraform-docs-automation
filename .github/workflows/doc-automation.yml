@@ -18,11 +18,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Set up Docker in the GitHub Actions runner
+    # Set up Docker Buildx (for multi-platform builds and caching)
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    # Cache Docker layers for faster subsequent builds
+    # Cache Docker layers for faster builds
     - name: Cache Docker layers
       uses: actions/cache@v3
       with:
@@ -31,43 +31,39 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-
 
-    # Build the Docker image
+    # Build the Docker image using the official Docker build action
     - name: Build the Docker image
-      run: |
-        docker build -t my-image-name .
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: apps/terraform-docs/Dockerfile
+        tags: terraform-docs-generator
 
-    # Run the container and check if `gcp/modules` is copied
+    # Test if gcp/modules is copied by listing its contents
     - name: Test if gcp/modules is copied
-      run: |
-        docker run --rm my-image-name ls -la /usr/src/app/gcp/modules
+      run: docker run --rm terraform-docs-generator ls -la /usr/src/app/gcp/modules
 
     # List all files in the image (for debugging, optional)
     - name: List all files in the image
-      run: |
-        docker run --rm my-image-name ls -la /usr/src/app
+      run: docker run --rm terraform-docs-generator ls -la /usr/src/app
 
-    # Run the container in detached mode and expose port 8080 for MkDocs
-    - name: Run container in detached mode for MkDocs
-      run: |
-        docker run -d -p 8080:8080 --name mkdocs-test my-image-name
+    # Run MkDocs in detached mode and expose port 8080
+    - name: Run MkDocs container in detached mode
+      run: docker run -d -p 8080:8080 --name mkdocs-test terraform-docs-generator
 
-    # Give MkDocs time to start
     - name: Wait for MkDocs to start
       run: sleep 10
 
-    # Test if MkDocs is being served on port 8080 using curl
+
+    # Test if MkDocs site is running on port 8080
     - name: Check if MkDocs site is running on port 8080
       run: |
         curl --fail http://localhost:8080 || (echo "MkDocs is not running" && exit 1)
 
-    # Clean up: Stop the MkDocs container and remove it
+    # Clean up: Stop and remove the MkDocs container
     - name: Clean up Docker container
-      run: |
-        docker stop mkdocs-test
-        docker rm mkdocs-test
+      run: docker stop mkdocs-test && docker rm mkdocs-test
 
-    # Clean up Docker images and containers to free up space
-    - name: Clean up Docker
-      run: |
-        docker system prune -f
-
+    # Clean up Docker system to free up space
+    - name: Clean up Docker system
+      run: docker system prune -f
