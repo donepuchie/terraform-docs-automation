@@ -159,3 +159,7 @@ mkdocs build
 
 # Notify that documentation has been generated
 echo "MkDocs documentation generated."
+
+# Serve MkDocs documentation
+echo "Starting MkDocs server..."
+mkdocs serve --dev-addr=0.0.0.0:8080
