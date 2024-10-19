@@ -29,10 +29,10 @@ jobs:
 
     # Build the Docker image using the official Docker build action
     - name: Build the Docker image
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v4
       with:
         context: .
-        file: apps/terraform-docs/Dockerfile
+        file: /apps/terraform-docs/Dockerfile
         tags: terraform-docs-generator
 
     # Test if gcp/modules is copied by listing its contents
