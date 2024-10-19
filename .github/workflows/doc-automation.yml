@@ -31,8 +31,8 @@ jobs:
     - name: Build the Docker image
       uses: docker/build-push-action@v5
       with:
-        context: "{{defaultContext}}:apps/terraform-docs"
-        file: ./Dockerfile
+        context: .
+        file: apps/terraform-docs/Dockerfile
         tags: terraform-docs-generator
 
     # Test if gcp/modules is copied by listing its contents
