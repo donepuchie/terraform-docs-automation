@@ -18,7 +18,7 @@ COPY ./apps/terraform-docs/scripts/monitoring.sh ./apps/terraform-docs/scripts/g
 COPY ./gcp/modules /usr/src/app/gcp/modules
 
 # Ensure the scripts are executable
-RUN chmod +x /usr/src/app/apps/terraform-docs/scripts/monitoring.sh /usr/src/app/apps/terraform-docs/scripts/generate.sh
+RUN chmod +x /usr/src/app/scripts/monitoring.sh /usr/src/app/scripts/generate.sh
 
 # Create necessary directories
 #RUN mkdir -p /usr/src/app/docs /usr/src/app/site
