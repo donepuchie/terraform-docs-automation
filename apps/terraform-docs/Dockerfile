@@ -27,7 +27,7 @@ RUN chmod +x /usr/src/app/apps/terraform-docs/scripts/monitoring.sh /usr/src/app
 EXPOSE 8080
 
 # Run the monitoring script when the container starts
-CMD ["/usr/src/app/apps/terraform-docs/scripts/monitoring.sh"]
+CMD ["/usr/src/app/scripts/monitoring.sh"]
 
 
 
