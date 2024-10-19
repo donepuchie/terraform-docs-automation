@@ -14,7 +14,7 @@ RUN apk add --no-cache inotify-tools bash curl python3 py3-pip cairo-dev pango-d
 WORKDIR /usr/src/app
 
 # Copy the scripts and Terraform modules into the container
-COPY ./apps/terraform-docs/scripts/monitoring.sh ./apps/terraform-docs/scripts/generate.sh /usr/src/app/apps/terraform-docs/scripts/
+COPY ./apps/terraform-docs/scripts/monitoring.sh ./apps/terraform-docs/scripts/generate.sh /usr/src/app/scripts/
 COPY ./gcp/modules /usr/src/app/gcp/modules
 
 # Ensure the scripts are executable
