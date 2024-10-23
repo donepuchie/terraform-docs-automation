@@ -4,9 +4,8 @@ resource "google_compute_managed_ssl_certificate" "frontend_ssl_cert" {
   
   managed {
     domains = var.ssl_cert_domains
-  }
 }
-
+ }
 # Serverless NEG for Cloud Run
 resource "google_compute_region_network_endpoint_group" "cloud_run_neg" {
   name                  = var.neg_name
@@ -22,7 +21,7 @@ resource "google_compute_region_network_endpoint_group" "cloud_run_neg" {
 resource "google_compute_backend_service" "cloud_run_backend" {
   name        = var.backend_service_name
   project     = var.project_id
-  protocol    = "HTTPS"  # Change to "HTTPS" if using HTTPS for Cloud Run
+  protocol    = "HTTP"  # Change to "HTTPS" if using HTTPS for Cloud Run
   port_name   = "http"
   timeout_sec = 30
 

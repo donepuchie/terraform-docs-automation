@@ -1,51 +1,68 @@
-name: Docker Build and MkDocs Test
+name: Terraform Build, Push to Artifact Registry, and Deploy to Cloud Run
 
-# Trigger the workflow on push to the main branch or on pull requests
+# Trigger workflow on push when any .tf files are changed
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    paths:
+      - '**/*.tf'
 
 # Define jobs
 jobs:
-  build:
-    # Use the latest Ubuntu environment
+  build-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+      REGION: ${{ secrets.GCP_REGION }}
+      REPO_NAME: ${{ secrets.ARTIFACT_REGISTRY_REPO }}
+      SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
     steps:
-    # Build the Docker image using the official Docker build action
-    - name: Build the Docker image
+    # Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Authenticate to GCP using Workload Identity
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ env.SERVICE_ACCOUNT }}
+
+    # Configure Docker to use Google Artifact Registry
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker "${{ env.REGION }}-docker.pkg.dev"
+
+    # Build and push Docker image to Google Artifact Registry
+    - name: Build and Push Docker image to Artifact Registry
       uses: docker/build-push-action@v6
       with:
-        file: apps/terraform-docs/Dockerfile
-        tags: terraform-docs-generator
+        file: ./apps/terraform-docs/Dockerfile  # Dockerfile location
+        push: true
+        tags: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/terraform-docs:latest"
 
-    # Test if gcp/modules is copied by listing its contents
-    - name: Test if gcp/modules is copied
-      run: docker run --rm terraform-docs-generator ls -la /usr/src/app/gcp/modules
-
-    # List all files in the image (for debugging, optional)
-    - name: List all files in the image
-      run: docker run --rm terraform-docs-generator ls -la /usr/src/app
-
-    # Run MkDocs in detached mode and expose port 8080
-    - name: Run MkDocs container in detached mode
-      run: docker run -d -p 8080:8080 --name mkdocs-test terraform-docs-generator
-
-    - name: Wait for MkDocs to start
-      run: sleep 10
-
-
-    # Test if MkDocs site is running on port 8080
-    - name: Check if MkDocs site is running on port 8080
+    # Deploy Docker image to Cloud Run
+    - name: Deploy to Cloud Run
       run: |
-        curl --fail http://localhost:8080 || (echo "MkDocs is not running" && exit 1)
+        gcloud run deploy terraform-docs-service \
+          --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/terraform-docs:latest \
+          --region=${{ env.REGION }} \
+          --platform=managed \
+          --allow-unauthenticated
 
-    # Clean up: Stop and remove the MkDocs container
-    - name: Clean up Docker container
-      run: docker stop mkdocs-test && docker rm mkdocs-test
+    # Send notification of deployment result
+    - name: Notify GitHub of Deployment Success
+      if: success()
+      run: echo "Deployment succeeded."
 
-    # Clean up Docker system to free up space
+    - name: Notify GitHub of Deployment Failure
+      if: failure()
+      run: echo "Deployment failed."
+
+    # Clean up Docker system after build
     - name: Clean up Docker system
       run: docker system prune -f
