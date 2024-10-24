@@ -1,22 +1,33 @@
 #!/bin/bash
 
-# monitoring.sh (modified for GitHub Actions)
+# monitoring.sh (for use within a container)
 
 # Directory containing Terraform modules inside the container
 MODULES_DIR="/usr/src/app/gcp/modules"
 
-# Function to handle MkDocs serve, assuming it is invoked locally or within a CI/CD environment
-start_mkdocs_serve() {
-    # Start MkDocs serve (typically this part is run locally, not in CI/CD)
-    echo "Serving MkDocs on port 8080 (not applicable in CI/CD)."
+# Function to trigger the batch generation process
+trigger_doc_generation() {
+    if [ -d "$MODULES_DIR" ]; then
+        echo "Starting documentation generation for all modules in $MODULES_DIR"
+        
+        # Call generate.sh to process all modules in batch
+        ./scripts/generate.sh "$MODULES_DIR"
+        
+        if [ $? -ne 0 ]; then
+            echo "Error: Documentation generation failed."
+            exit 1
+        else
+            echo "Documentation generation for all modules completed successfully."
+        fi
+    else
+        echo "Error: Modules directory $MODULES_DIR does not exist."
+        exit 1
+    fi
 }
 
-# First, generate documentation for all modules
-for dir in "$MODULES_DIR"/*/; do
-    if [ -d "$dir" ]; then
-        ./scripts/generate.sh "$dir"
-        echo "Documentation generated for module: $dir"
-    fi
-done
+# Monitor the modules directory and trigger generation
+trigger_doc_generation
+
+
 
 
