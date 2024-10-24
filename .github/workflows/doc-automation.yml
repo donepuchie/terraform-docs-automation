@@ -4,7 +4,10 @@ name: Terraform Build, Push to Artifact Registry, and Deploy to Cloud Run
 on:
   push:
     paths:
-      - '**/*.tf'
+      - '**/*.tf'               # Keep watching Terraform files
+      - '**/Dockerfile'          # Watch Dockerfiles
+      - '**/gco/modules/**'      # Watch all files in gcp/modules
+
 
 # Define jobs
 jobs:
