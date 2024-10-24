@@ -17,3 +17,4 @@ output "dns_aaaa_record_name" {
   description = "The name of the AAAA record (if enabled)"
   value       = var.enable_ipv6 ? google_dns_record_set.aaaa_record[0].name : null
 }
+
