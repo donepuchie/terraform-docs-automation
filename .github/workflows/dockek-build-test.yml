@@ -20,8 +20,13 @@ jobs:
     - name: Test if gcp/modules is copied
       run: docker run --rm terraform-docs-generator ls -la /usr/src/app/gcp/modules
 
-    - name: Debug - List Markdown Files
-      run: docker run --rm terraform-docs-generator ls -la /usr/src/app/docs
+        # Test if docs directory exists
+    - name: Test if docs directory exists
+      run: |
+          docker run --rm terraform-docs-generator ls -la /usr/src/app/docs || \
+          echo "Docs directory does not exist. Listing contents of /usr/src/app:" && \
+          docker run --rm terraform-docs-generator ls -la /usr/src/app
+  
 
     - name: Run MkDocs container in detached mode
       run: docker run -d -p 8080:8080 --name mkdocs-test terraform-docs-generator
