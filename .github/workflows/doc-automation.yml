@@ -25,10 +25,6 @@ jobs:
       SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
     steps:
-    # Checkout the repository
-    - name: Checkout code
-      uses: actions/checkout@v3
-
     # Authenticate to GCP using Workload Identity
     - name: Authenticate to GCP
       uses: google-github-actions/auth@v1
@@ -44,7 +40,6 @@ jobs:
     - name: Build and Push Docker image to Artifact Registry
       uses: docker/build-push-action@v6
       with:
-        context: ./ 
         file: ./apps/terraform-docs/Dockerfile  # Dockerfile location
         push: true
         tags: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/terraform-docs:latest"
