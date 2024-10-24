@@ -41,6 +41,7 @@ jobs:
     - name: Build and Push Docker image to Artifact Registry
       uses: docker/build-push-action@v6
       with:
+        context: ./ 
         file: ./apps/terraform-docs/Dockerfile  # Dockerfile location
         push: true
         tags: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/terraform-docs:latest"
