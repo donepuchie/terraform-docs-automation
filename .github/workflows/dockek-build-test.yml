@@ -1,51 +1,41 @@
 name: Docker Build and MkDocs Test
 
-# Trigger the workflow on push to the main branch or on pull requests
 on:
   workflow_dispatch:
   push:
     branches:
       - main
 
-# Define jobs
 jobs:
   build:
-    # Use the latest Ubuntu environment
     runs-on: ubuntu-latest
 
     steps:
-    # Build the Docker image using the official Docker build action
     - name: Build the Docker image
       uses: docker/build-push-action@v6
       with:
         file: apps/terraform-docs/Dockerfile
         tags: terraform-docs-generator
 
-    # Test if gcp/modules is copied by listing its contents
     - name: Test if gcp/modules is copied
       run: docker run --rm terraform-docs-generator ls -la /usr/src/app/gcp/modules
 
-    # List all files in the image (for debugging, optional)
-    - name: List all files in the image
-      run: docker run --rm terraform-docs-generator ls -la /usr/src/app
+    - name: Debug - List Markdown Files
+      run: docker run --rm terraform-docs-generator ls -la /usr/src/app/docs
 
-    # Run MkDocs in detached mode and expose port 8080
     - name: Run MkDocs container in detached mode
       run: docker run -d -p 8080:8080 --name mkdocs-test terraform-docs-generator
 
     - name: Wait for MkDocs to start
       run: sleep 10
 
-
-    # Test if MkDocs site is running on port 8080
     - name: Check if MkDocs site is running on port 8080
       run: |
         curl --fail http://localhost:8080 || (echo "MkDocs is not running" && exit 1)
 
-    # Clean up: Stop and remove the MkDocs container
     - name: Clean up Docker container
       run: docker stop mkdocs-test && docker rm mkdocs-test
 
-    # Clean up Docker system to free up space
     - name: Clean up Docker system
       run: docker system prune -f
+

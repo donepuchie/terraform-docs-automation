@@ -28,6 +28,9 @@ mkdir -p /usr/src/app/site
 # Convert MODULE_DIR to an absolute path
 MODULE_DIR=$(realpath "$MODULE_DIR")
 
+# Logging: Show which module is being processed
+echo "Generating documentation for module: $MODULE_NAME located at: $MODULE_DIR"
+
 # Generate Terraform documentation using terraform-docs
 terraform-docs markdown table "$MODULE_DIR" > "$OUTPUT_MD"
 if [ $? -ne 0 ]; then
@@ -41,6 +44,14 @@ while [ ! -f "$OUTPUT_MD" ]; do
 done
 
 echo "Documentation generated for $MODULE_NAME and saved to $OUTPUT_MD"
+
+# Verify that the Markdown file has been generated
+if [ -f "$OUTPUT_MD" ]; then
+    echo "Verified: $OUTPUT_MD exists."
+else
+    echo "Error: Markdown file $OUTPUT_MD was not generated."
+    exit 1
+fi
 
 # Create or update mkdocs.yml if it doesn't exist
 MKDOCS_YML="/usr/src/app/mkdocs.yml"
@@ -155,11 +166,25 @@ else
 fi
 
 # Build MkDocs documentation
-mkdocs build 
+echo "Building MkDocs documentation..."
+mkdocs build --verbose
+if [ $? -ne 0 ]; then
+    echo "Error: MkDocs build failed"
+    exit 1
+fi
+echo "MkDocs build successful."
 
-# Notify that documentation has been generated
-echo "MkDocs documentation generated."
+# Verify that all .md files are present
+echo "Verifying generated Markdown files..."
+for md_file in /usr/src/app/docs/*.md; do
+    if [ -f "$md_file" ]; then
+        echo "Found: $md_file"
+    else
+        echo "Warning: Expected Markdown file $md_file is missing."
+    fi
+done
 
 # Serve MkDocs documentation
 echo "Starting MkDocs server..."
 mkdocs serve --dev-addr=0.0.0.0:8080
+
