@@ -1,4 +1,4 @@
-name: Terraform Build, Push to Artifact Registry, and Deploy to Cloud Run
+name: Terraform-doc-automation
 
 on:
   push:
@@ -23,6 +23,10 @@ jobs:
       SERVICE_NAME: terraform-docs-automation
 
     steps:
+    # Check out the repository
+    - name: Check out repository
+      uses: actions/checkout@v3  # You can specify a version; here we're using the latest stable version
+
     # Authenticate to GCP using Workload Identity
     - name: Authenticate to GCP
       uses: google-github-actions/auth@v1
