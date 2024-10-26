@@ -4,8 +4,9 @@ resource "google_compute_managed_ssl_certificate" "frontend_ssl_cert" {
   
   managed {
     domains = var.ssl_cert_domains
+  }
+
 }
- }
 # Serverless NEG for Cloud Run
 resource "google_compute_region_network_endpoint_group" "cloud_run_neg" {
   name                  = var.neg_name
@@ -43,12 +44,7 @@ resource "google_compute_url_map" "default" {
   path_matcher {
     name            = "allpaths"
     default_service = google_compute_backend_service.cloud_run_backend.id
-
-    path_rule {
-      paths   = ["/*"]
-      service = google_compute_backend_service.cloud_run_backend.id
-    }
-  }
+}
 }
 
 # Target HTTPS Proxy
@@ -79,6 +75,8 @@ resource "google_compute_global_forwarding_rule" "https_redirect" {
   target     = google_compute_target_http_proxy.https_redirect.id
   port_range = "80"
   ip_address  = google_compute_global_address.ipv4.address
+
+  depends_on = [google_compute_global_address.ipv4]
 }
 
 # Global Forwarding Rule for HTTPS
@@ -88,6 +86,9 @@ resource "google_compute_global_forwarding_rule" "https_rule" {
   port_range  = "443"
   load_balancing_scheme = "EXTERNAL"
   ip_address = google_compute_global_address.ipv4.address
+
+  depends_on = [google_compute_global_address.ipv4]
+
 }
 
 resource "google_compute_global_address" "ipv4" {

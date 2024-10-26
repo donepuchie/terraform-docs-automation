@@ -8,11 +8,6 @@ variable "dns_name" {
   type        = string
 }
 
-variable "subdomain" {
-  description = "The subdomain for which the DNS record is created"
-  type        = string
-}
-
 variable "dns_ttl" {
   description = "Time-to-live for DNS records (in seconds)"
   type        = number

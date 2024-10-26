@@ -7,7 +7,7 @@ resource "google_dns_managed_zone" "dns_zone" {
 
 # A record for IPv4
 resource "google_dns_record_set" "a_record" {
-  name         = format("%s.%s", var.subdomain, var.dns_name)
+  name         = var.dns_name
   type         = "A"
   ttl          = var.dns_ttl
   managed_zone = var.dns_zone
@@ -17,7 +17,7 @@ resource "google_dns_record_set" "a_record" {
 # AAAA record for IPv6, created only if IPv6 is enabled
 resource "google_dns_record_set" "aaaa_record" {
   count        = var.enable_ipv6 ? 1 : 0
-  name         = format("%s.%s", var.subdomain, var.dns_name)
+  name         = var.dns_name
   type         = "AAAA"
   ttl          = var.dns_ttl
   managed_zone = var.dns_zone

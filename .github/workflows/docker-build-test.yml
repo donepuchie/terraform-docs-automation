@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/docker-build-test.yml  
 
 jobs:
   build:
