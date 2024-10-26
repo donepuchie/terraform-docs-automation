@@ -3,8 +3,6 @@ name: Docker Build and MkDocs Test
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
     paths:
       - .github/workflows/docker-build-test.yml  
 

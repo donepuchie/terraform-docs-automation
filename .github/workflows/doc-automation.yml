@@ -1,15 +1,12 @@
 name: Terraform Build, Push to Artifact Registry, and Deploy to Cloud Run
 
-# Trigger workflow on push when any .tf files are changed
 on:
   push:
     paths:
-      - '**/*.tf'               # Keep watching Terraform files
+      - '**/*.tf'               # Watch Terraform files
       - '**/Dockerfile'          # Watch Dockerfiles
-      - '**/gco/modules/**'      # Watch all files in gcp/modules
+      - '**/gcp/modules/**'      # Watch all files in gcp/modules
 
-
-# Define jobs
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -23,6 +20,7 @@ jobs:
       REGION: ${{ secrets.GCP_REGION }}
       REPO_NAME: ${{ secrets.ARTIFACT_REGISTRY_REPO }}
       SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      SERVICE_NAME: terraform-docs-service
 
     steps:
     # Authenticate to GCP using Workload Identity
@@ -47,11 +45,12 @@ jobs:
     # Deploy Docker image to Cloud Run
     - name: Deploy to Cloud Run
       run: |
-        gcloud run deploy terraform-docs-service \
+        gcloud run deploy ${{ env.SERVICE_NAME }} \
           --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/terraform-docs:latest \
           --region=${{ env.REGION }} \
           --platform=managed \
-          --allow-unauthenticated
+          --allow-unauthenticated \
+          --set-traffic=latest=100
 
     # Send notification of deployment result
     - name: Notify GitHub of Deployment Success
@@ -65,3 +64,4 @@ jobs:
     # Clean up Docker system after build
     - name: Clean up Docker system
       run: docker system prune -f
+
