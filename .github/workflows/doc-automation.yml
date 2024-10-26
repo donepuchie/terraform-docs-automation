@@ -20,7 +20,7 @@ jobs:
       REGION: ${{ secrets.GCP_REGION }}
       REPO_NAME: ${{ secrets.ARTIFACT_REGISTRY_REPO }}
       SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-      SERVICE_NAME: terraform-docs-service
+      SERVICE_NAME: terraform-docs-automation
 
     steps:
     # Authenticate to GCP using Workload Identity
@@ -50,7 +50,6 @@ jobs:
           --region=${{ env.REGION }} \
           --platform=managed \
           --allow-unauthenticated \
-          --set-traffic=latest=100
 
     # Send notification of deployment result
     - name: Notify GitHub of Deployment Success
