@@ -30,3 +30,4 @@ variable "aaaa_record_ip" {
   type        = string
   default     = ""  # Default is empty, IPv6 will be optional
 }
+
