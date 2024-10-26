@@ -8,7 +8,7 @@ output "global_ip_v6" {
   value       = var.enable_ipv6 ? google_compute_global_address.ipv6[0].address : null
 }
 
-# In the load_balancer module's outputs.tf
+
 output "url_map_url" {
   description = "The URL of the URL map"
   value       = google_compute_url_map.default.self_link

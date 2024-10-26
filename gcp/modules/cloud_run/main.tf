@@ -13,7 +13,7 @@ resource "google_cloud_run_service" "terraform_docs_service" {
   template {
     spec {
       containers {
-        # Update image reference to use Artifact Registry image
+      
         image = var.image_name
 
         resources {

@@ -1,4 +1,4 @@
-# Input Variables for the Load Balancer module
+# Input Variables for the Load Balancer
 variable "project_id" {
   description = "The unique identifier for the Google Cloud project where the load balancer resources will be created. This ID associates the load balancer with the correct project context for billing and resource management."
 }

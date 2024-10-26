@@ -56,7 +56,7 @@ resource "google_compute_target_https_proxy" "default" {
 
 # HTTP-to-HTTPS resources
 resource "google_compute_url_map" "https_redirect" {
-  name = format("%s-https-redirect", var.https_redirect_name)  # Use format for cleaner naming
+  name = format("%s-https-redirect", var.https_redirect_name)  
 
   default_url_redirect {
     https_redirect         = true
@@ -66,12 +66,12 @@ resource "google_compute_url_map" "https_redirect" {
 }
 
 resource "google_compute_target_http_proxy" "https_redirect" {
-  name   = format("%s-http-proxy", var.https_redirect_name)  # Use format for cleaner naming
+  name   = format("%s-http-proxy", var.https_redirect_name)  
   url_map = google_compute_url_map.https_redirect.id
 }
 
 resource "google_compute_global_forwarding_rule" "https_redirect" {
-  name       = format("%s-fwdrule-http", var.https_redirect_name)  # Use format for cleaner naming
+  name       = format("%s-fwdrule-http", var.https_redirect_name)  
   target     = google_compute_target_http_proxy.https_redirect.id
   port_range = "80"
   ip_address  = google_compute_global_address.ipv4.address
