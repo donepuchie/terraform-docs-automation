@@ -84,8 +84,8 @@ The Dockerfile deploys an MkDocs application running in development mode on Clou
 ## Continuous Integration and Continuous Delivery (CI/CD)
 This repository includes a CI/CD workflow set up with GitHub Actions. The workflow performs the following tasks:
 
-- Builds the Docker image.
-- Pushes the Docker image to Google Cloud Run, authenticating using Workload Identity.
+- Builds the Docker image and packages the generated documentation.
+- Pushes the Docker image to Google Artifact registry and finally Google Cloud Run to deploy the containerized documentation, authenticating using Workload Identity.
 The workflow is triggered on push to the main branch and on changes to Terraform files (with a .tf extension). It is configured to deploy automatically with every update.
 
 To configure the CI workflow for your own project, ensure that you have the necessary permissions and credentials set up for Google Cloud Workload Identity.
