@@ -1,5 +1,5 @@
 
-# Automated Terraform Module Documentation System
+# Terraform Documentation Automation and Hosting
 
 ## Containerized, Continuous Documentation for Terraform Modules on GCP
 
@@ -24,7 +24,7 @@ By integrating documentation generation into the CI/CD pipeline, this system red
    cd terraform-docs-automation
 
 2. **Create a terraform.tfvars file with module-specific parameters. Below is an example:**
-```javascript
+```hcl
 # Artifact Registry settings
 repository_id = "your-docker-repo"
 
